@@ -9,7 +9,7 @@ library(tidyverse)
 # 1. Looking at the data
 glimpse(evals)
 
-# 2. Creating Visualiztions
+# 2. Creating Visualizations
 evals %>% 
   ggplot(aes(x = score)) +
   geom_histogram(binwidth = 0.25, color = "black") +
