@@ -1,0 +1,139 @@
+---
+title: "01 Introduction to modeling"
+author: "Edneide Ramalho"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+    html_document:
+      highlight: textmate
+      logo: logo.png
+      theme: cerulean
+      number_sections: yes
+      toc: yes
+      toc_float:
+        collapsed: yes
+        smooth_scroll: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercises
+
+## **Exploratory visualization of age**
+
+Let's perform an exploratory data analysis (EDA) of the numerical explanatory variable `age`. You should always perform an exploratory analysis of your variables before any formal modeling. This will give you a sense of your variable's distributions, any outliers, and any patterns that might be useful when constructing your eventual model.
+
+-   Using the `ggplot2` package, create a histogram of `age` with bins in 5 year increments.
+
+-   Label the `x` axis with `"age"` and the `y` axis with `"count"`.
+
+```{r}
+# Load packages
+library(moderndive)
+library(ggplot2)
+
+# Plot the histogram
+ggplot(evals, aes(x = age)) +
+  geom_histogram(binwidth = 5) +
+  labs(x = "age", y = "count")
+```
+
+## **Numerical summaries of age**
+
+Let's continue our exploratory data analysis of the numerical explanatory variable `age` by computing **summary statistics**. Summary statistics take many values and summarize them with a single value. Let's compute three such values using `dplyr` data wrangling: mean (AKA the average), the median (the middle value), and the standard deviation (a measure of spread/variation).
+
+Calculate the mean, median, and standard deviation of `age`.
+
+```{r}
+# Load packages
+library(moderndive)
+library(dplyr)
+
+# Compute summary stats
+evals %>%
+  summarise(mean_age = mean(age),
+            median_age = median(age),
+            sd_age = sd(age))
+```
+
+# Background on modeling for prediction
+
+**Question**:
+
+> Can we predict the sale price of houses based on their features?
+
+**Variables:**
+
+-   $y$: House sale price
+
+-   $\vec{x}$: Features like `sqft_living`, `condintion`, `bedrooms`, `yr_built`, `waterfront`
+
+```{r}
+library(dplyr)
+library(moderndive)
+glimpse(house_prices)
+```
+
+Steps to follow before modeling:
+
+-   Looking at the data
+
+-   Visualization
+
+-   Summary Statistics
+
+## EDA
+
+```{r}
+library(ggplot2)
+ggplot(house_prices, aes(x = price)) +
+  geom_histogram() +
+  labs(x = "house price", y = "count")
+```
+
+-   The majority of the houses is less than 2 million dollars
+
+-   There are few houses with prices close to 8 million dollars
+
+-   The price distribution is right-skewed (it shows a long right tail )
+
+## Log10 Transformation
+
+```{r}
+house_prices <- house_prices %>% 
+  mutate(log10_price = log10(price)) 
+```
+
+```{r}
+ggplot(house_prices, aes(x = log10_price)) +
+  geom_histogram() +
+  labs(x = "log10 house price", y = "count")
+```
+
+-   With the log transformation, price distribution is less skewed and more symmetrical.
+
+## Exercises
+
+# **Exploratory visualization of house size**
+
+Let's create an exploratory visualization of the predictor variable reflecting the size of houses: `sqft_living` the square footage of living space where 1 sq.foot ≈ 0.1 sq.meter.
+
+After plotting the histogram, what can you say about the distribution of the variable `sqft_living`?
+
+##### 
+
+-   Create a histogram of `sqft_living`.
+
+-   Label the `x` axis with `"Size (sq.feet)"` and the `y` axis with `"count"`.
+
+```{r}
+# Load packages
+library(moderndive)
+library(ggplot2)
+
+# Plot the histogram
+ggplot(house_prices, aes(x = sqft_living)) +
+  geom_histogram() +
+  labs(x = "Size (sq.feet)", y = "count")
+```
