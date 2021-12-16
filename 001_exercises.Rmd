@@ -137,3 +137,129 @@ ggplot(house_prices, aes(x = sqft_living)) +
   geom_histogram() +
   labs(x = "Size (sq.feet)", y = "count")
 ```
+
+-   `sqft_living` is right-skewed, as we can see by the long right tail.
+
+## **Log10 transformation of house size**
+
+You just saw that the predictor variable `sqft_living` is *right*-skewed and hence a log base 10 transformation is warranted to unskew it. Just as we transformed the outcome variable `price` to create `log10_price` in the video, let's do the same for `sqft_living`.
+
+-   Using the `mutate()` function from `dplyr`, create a new column `log10_size` and assign it to `house_prices_2` by applying a `log10()` transformation to `sqft_living`.
+
+```{r}
+# Load packages
+library(moderndive)
+library(dplyr)
+library(ggplot2)
+
+# Add log10_size
+house_prices_2 <- house_prices %>%
+  mutate(log10_size = log10(sqft_living))
+
+# Plot the histogram  
+ggplot(house_prices_2, aes(x = log10_size)) +
+  geom_histogram() +
+  labs(x = "log10 size", y = "count")
+
+```
+
+-   The log10 transformation makes the sqft_living much less skewed.
+
+# The modeling problem for explanation
+
+$$
+y = f(\vec{x}) + \epsilon
+$$
+
+1.  $f()$ and $\epsilon$ are unknown
+2.  $n$ observations of $y$ and $\vec{x}$ are known/given in the data
+3.  **Goal**: Fit a model $\hat{f}()$ that approximates $f()$ whilhe ignoring $\epsilon$
+4.  **Goal restated:** Separate the signal from the noise
+5.  Can then generate fitted/predicted values $\hat{y} = \hat{f}(\vec{x})$
+
+## EDA of relationship
+
+```{r}
+evals %>% 
+  ggplot(aes(x = age, y = score)) +
+  geom_point() +
+  labs(x = "age", y = "score",
+       title = "Teaching score over age")
+```
+
+-   We can not see a positive or negative relationship here, because the pattern is not clear.
+
+-   Let's take a look of overplotting: let's add a jitter
+
+```{r}
+evals %>% 
+  ggplot(aes(x = age, y = score)) +
+  geom_jitter() +
+  labs(x = "age", y = "score",
+       title = "Teaching score over age (jittered)")
+```
+
+## Computing the correlation coefficient 
+
+```{r}
+evals %>% 
+  summarise(correlation = cor(score, age))
+```
+
+-   There is a negative correlation, meaning that as the teachers age they get smaller scores. But this correlation coefficient is weak.
+
+## Exercises
+
+# **EDA of relationship of teaching & "beauty" scores**
+
+The researchers in the UT Austin created a "beauty score" by asking a panel of 6 students to rate the "beauty" of all 463 instructors. They were interested in studying any possible impact of "beauty" of teaching evaluation scores. Let's do an EDA of this variable and its relationship with teaching `score`.
+
+From now on, assume that `ggplot2`, `dplyr`, and `moderndive` are all available in your workspace unless you're told otherwise.
+
+-   Create a histogram of `bty_avg` "beauty scores" with bins of size 0.5.
+
+```{r}
+# Plot the histogram
+ggplot(evals, aes(x = bty_avg)) +
+  geom_histogram(binwidth = 0.5) +
+  labs(x = "Beauty score", y = "count")
+```
+
+-   Create a scatterplot with the outcome variable `score` on the y-axis and the explanatory variable `bty_avg` on the x-axis.
+
+```{r}
+# Scatterplot
+ggplot(evals, aes(x = bty_avg, y = score)) +
+  geom_point() +
+  labs(x = "beauty score", y = "teaching score")
+```
+
+-   Let's now investigate if this plot suffers from *overplotting*, whereby points are stacked perfectly on top of each other, obscuring the number of points involved. You can do this by `jitter`ing the points. Update the code accordingly!
+
+```{r}
+# Scatterplot
+ggplot(evals, aes(x = bty_avg, y = score)) +
+  geom_jitter() +
+  labs(x = "beauty score", y = "teaching score")
+```
+
+# **Correlation between teaching and "beauty" scores**
+
+Let's numerically summarize the relationship between teaching `score` and beauty score `bty_avg` using the correlation coefficient. Based on this, what can you say about the relationship between these two variables?
+
+-   Compute the correlation coefficient of `score` and `bty_avg`.
+
+```{r}
+# Compute correlation
+evals %>%
+  summarize(correlation = cor(score, bty_avg))
+```
+
+-   Positive correlation, but weak.
+
+# The modeling problem for Prediction
+
+## Difference between explanation and prediciton
+
+1.  **Explanation:** We care about the form of $\hat{f}()$, in particular any values quantifying relationships between $y$ and $\vec{x}$.
+2.  **Prediction:** We don't care so much about the form of $\hat{f}()$, only that it yields "good" predictions $\hat{y}$ of $y$ based on $\vec{x}$.
